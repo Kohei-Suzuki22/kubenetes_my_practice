@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: httpserver
+  labels:
+    app: httpserver
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: httpserver # templateのlabelsを一致させること。
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      restartPolicy: Always            # Always, OnFailure, Never   # デフォルトはAlways
+      containers:
+      - name: nginx
+        image: nginx:1.25.3
+        imagePullPolicy: IfNotPresent  # Always, IfNotPresent, Never    
+        # ↑ イメージタグがlatestの場合のデフォルトは、Alyways. イメージタグがlatestじゃない場合のデフォルトは、IfNotPresent
+        ports:
+        - containerPort: 8080
