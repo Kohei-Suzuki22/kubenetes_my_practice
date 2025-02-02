@@ -1,0 +1,21 @@
+## service
+
+#### type: nodeType
+#### nodeが定義している <NodeIP>:<NodePort> で、内部のpod(pod内で定義されたcontainerのport)にアクセスする。
+
+#### ??? 一つのnodeに複数portを利用している場合、nodeportは使えないのではないか？
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  type: NodePort # ClusterIP, NodePort, LoadBalancer, ExternalName
+  #  sessionAffinity: ClientIP
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30599

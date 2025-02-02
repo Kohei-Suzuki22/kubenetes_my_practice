@@ -1,0 +1,19 @@
+## service
+
+#### type: clusterIp
+#### cluster内でのmappingを定義するだけなので、外部からはアクセスできない
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  type: ClusterIP                      # ClusterIP, NodePort, LoadBalancer, ExternalName
+  #  sessionAffinity: ClientIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
