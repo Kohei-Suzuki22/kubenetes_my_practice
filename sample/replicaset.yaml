@@ -21,4 +21,4 @@ spec:
         imagePullPolicy: IfNotPresent  # Always, IfNotPresent, Never    
         # ↑ イメージタグがlatestの場合のデフォルトは、Alyways. イメージタグがlatestじゃない場合のデフォルトは、IfNotPresent
         ports:
-        - containerPort: 8080
+        - containerPort: 80
