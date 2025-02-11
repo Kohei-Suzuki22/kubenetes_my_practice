@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: date-checker
+spec:
+  ttlSecondsAfterFinished: 100
+  completions: 1          # 指定した回数podが成功したらjobが完了となる。
+  parallelism: 1          # job並列数
+  template:
+    spec:
+      restartPolicy: OnFailure # Always, OnFailure, Never
+      containers:
+        - name: date
+          image: ubuntu:22.04
+          imagePullPolicy: IfNotPresent # Always, IfNotPresent, Never
+          command: ["date"]
+  backoffLimit: 4
