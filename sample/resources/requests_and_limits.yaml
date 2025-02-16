@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver-deployment
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 100%
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      restartPolicy: Always # Always, OnFailure, Never
+      containers:
+        - name: http-container
+          image: nginx:1.25.3
+          imagePullPolicy: IfNotPresent # Always, IfNotPresent, Never
+          ports:
+            - containerPort: 80
+          resources:
+            requests:               # requests: リソースの最低使用量の指定
+              cpu: "10m"
+              memory: "64Mi"
+            limits:                 # limits:   リソース使用量の上限
+              cpu: "100m"
+              memory: "640Mi"
