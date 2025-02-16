@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver-deployment
+spec:
+  replicas: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 100%
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      containers:
+        - name: http-container
+          image: blux2/delayfailserver:1.1
+          ports:
+            - containerPort: 8080
+          ## startupProbe:　
+          ## -> コンテナアプリケーションの起動の完了を確かめるために使う。
+          ## -> startupProbeを指定している場合は、StartupProbeが成功するまでは、LivenessProbeとReadinessProbeのチェックを判断しない。
+          ## -> アプリケーションの起動が遅いケースに実行使う。
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5 # probeを実行するまでに5秒待つ。
+            periodSeconds: 5 # probeが5秒間隔で実行される。
+            timeoutSeconds: 10 # タイムアウト時間
+            successThreshold: 1 # startup_probeは、 successTheasholdを1とする必要がある。
+            failureThreshold: 3 # 3回probe失敗で失敗。

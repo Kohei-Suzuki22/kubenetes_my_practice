@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver-deployment
+spec:
+  replicas: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 100%
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      restartPolicy: Always # Always, OnFailure, Never
+      containers:
+        - name: http-container
+          image: blux2/delayfailserver:1.1
+          imagePullPolicy: IfNotPresent # Always, IfNotPresent, Never
+          ports:
+            - containerPort: 8080
+          # readinessProbe,livenessProbeの実行前に実行される。
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 3
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 2

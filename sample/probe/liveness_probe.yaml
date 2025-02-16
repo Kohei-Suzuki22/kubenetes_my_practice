@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver-deployment
+spec:
+  replicas: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 100%
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      containers:
+        - name: http-container
+          image: blux2/delayfailserver:1.1
+          ports:
+            - containerPort: 8080
+          ## livenessProbe:
+          ## -> ヘルスチェックが失敗した時に、Podを再起動する。
+          ## -> LivenessProbeは、「ALB + ECS のヘルスチェック」と同じような挙動っぽい。
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 10
+            successThreshold: 1   # livenessProbeの場合は must be 1 らしい。
+            failureThreshold: 3

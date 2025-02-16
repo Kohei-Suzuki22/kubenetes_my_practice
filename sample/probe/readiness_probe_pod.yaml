@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: httpserver-readiness
+  labels:
+    app: httpserver
+spec:
+  restartPolicy: Always # Always, OnFailure, Never
+  containers:
+    - name: httpserver
+      image: blux2/delayfailserver:1.1
+      imagePullPolicy: IfNotPresent # Always, IfNotPresent, Never
+      ports:
+        - containerPort: 8080
+      ## readinessProbe:　
+      ## -> ヘルスチェックが成功するまではserviceに含まれず、トラフィックを受けない。
+      ## -> ヘルスチェックに失敗してもpodは生存しているので、状況把握に監視が欲しい。
+      readinessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+        initialDelaySeconds: 5  # probeを実行するまでに5秒待つ。
+        periodSeconds: 5        # probeが5秒間隔で実行される。
+        timeoutSeconds: 10      # タイムアウト時間
+        successThreshold: 3     # 3回probeクリアで成功とする。
+        failureThreshold: 3     # 3回probe失敗で失敗。
+
